@@ -61,4 +61,28 @@ function SignOut() {
   )
 }
 
+function ChatRoom(){
+
+  const messagesRef = firestore.collection('messages');
+  const query = messagesRef.orderBy('createdAt').limit(20);
+
+  // react will re-render whenever this obj of messages changes
+  const [messages] = userCollectionData(query, {idField: 'id'});
+
+  return (
+    <>
+      <div>
+        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
+      </div>
+    </>
+  )
+}
+
+function ChatMessage(props) {
+  const { text, uid } = props.message;
+
+  return <p>{text}</p>
+
+}
+
 export default App;
