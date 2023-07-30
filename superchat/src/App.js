@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 
-import firebase from 'firebase/app';
-import 'firebase/firestore' // Database
-import 'firestore/auth' // User Auth
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore' // Database
+import 'firebase/compat/auth' // User Auth
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
@@ -26,7 +26,7 @@ const firestore = firebase.firestore();
 function App() {
   // if user signed in -> user is an obj
   // if user signed out -> user is null
-  const [user] = userAuthState(auth);
+  const [user] = useAuthState(auth);
 
 
   return (
@@ -67,7 +67,7 @@ function ChatRoom(){
   const query = messagesRef.orderBy('createdAt').limit(20);
 
   // react will re-render whenever this obj of messages changes
-  const [messages] = userCollectionData(query, {idField: 'id'});
+  const [messages] = useCollectionData(query, {idField: 'id'});
 
   return (
     <>
