@@ -7,6 +7,7 @@ import 'firebase/compat/auth' // User Auth
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useState } from 'react'
 
 firebase.initializeApp({
   // Config rom https://console.firebase.google.com/u/0/project/chat-app-a06b7/overview
@@ -69,7 +70,24 @@ function ChatRoom(){
 
   // react will re-render whenever this obj of messages changes
   const [messages] = useCollectionData(query, {idField: 'id'});
-  
+
+  const [formValue, setFormValue] = useState('');
+
+  const sendMessage = async(e) => {
+    e.preventDefault(); // prevents default page refresh when form submitted
+    const {uid, photoURL} = auth.currentUser;
+
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    })
+
+    setFormValue(''); // reset form value
+
+  }
+
   /*
   in project > firestore > rules
 
@@ -101,14 +119,27 @@ function ChatRoom(){
       <div>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
       </div>
+
+      <form onSubmit={sendMessage}>
+      <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
+
+      <button type="submit">🫡</button>
+
+
+      </form>
     </>
   )
 }
 
 function ChatMessage(props) {
-  const { text, uid } = props.message;
+  const { text, uid, photoURL } = props.message;
 
-  return <p>{text}</p>
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+  
+  return <div className={`message ${messageClass}`}>
+    <img src={photoURL} />
+    <p>{text}</p>
+  </div>
 
 }
 
