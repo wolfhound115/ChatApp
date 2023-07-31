@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import './App.css';
 
 import firebase from 'firebase/compat/app';
@@ -7,7 +7,6 @@ import 'firebase/compat/auth' // User Auth
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { useState } from 'react'
 
 firebase.initializeApp({
   // Config rom https://console.firebase.google.com/u/0/project/chat-app-a06b7/overview
@@ -64,6 +63,8 @@ function SignOut() {
 
 function ChatRoom(){
 
+  const dummy = useRef();
+
   const messagesRef = firestore.collection('messages');
   const query = messagesRef.orderBy('createdAt').limit(20);
   console.log("Render chat room")
@@ -85,6 +86,8 @@ function ChatRoom(){
     })
 
     setFormValue(''); // reset form value
+
+    dummy.current.scrollIntoView({ behavior: 'smooth'});
 
   }
 
@@ -116,14 +119,18 @@ function ChatRoom(){
  
   return (
     <>
-      <div>
+      <main>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/>)}
-      </div>
+
+        <div ref={dummy}></div>
+
+      </main>
 
       <form onSubmit={sendMessage}>
-      <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
 
-      <button type="submit">🫡</button>
+        <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
+
+        <button type="submit">🫡</button>
 
 
       </form>
