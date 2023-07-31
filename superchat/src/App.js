@@ -47,7 +47,7 @@ function SignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
   }
-  
+  console.log("Render sign in")
   return  (
     <button onClick={signInWithGoogle}>Sign in with Google</button>
   )
@@ -65,10 +65,37 @@ function ChatRoom(){
 
   const messagesRef = firestore.collection('messages');
   const query = messagesRef.orderBy('createdAt').limit(20);
+  console.log("Render chat room")
 
   // react will re-render whenever this obj of messages changes
   const [messages] = useCollectionData(query, {idField: 'id'});
+  
+  /*
+  in project > firestore > rules
 
+  rules_version = '2';
+
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+  }
+
+  change to 
+  
+  rules_version = '2';
+
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /{document=**} {
+        allow read, write: if request.auth.uid!=null;
+      }
+    }
+  }
+  */
+ 
   return (
     <>
       <div>
